@@ -1,4 +1,3 @@
-from __future__ import division
 import abce
 
 
@@ -27,8 +26,8 @@ class Firm(abce.Agent, abce.Firm, abce.Trade):
         a = self.cd_labor
         b = self.cd_capital
 
-        labor = self.possession('labor')
-        capital = self.possession('capital')
+        labor = self['labor']
+        capital = self['capital']
 
         self.mpl = a * labor ** (a - 1) * capital ** b
         self.mpc = labor ** a * b * capital ** (b - 1)
@@ -41,14 +40,13 @@ class Firm(abce.Agent, abce.Firm, abce.Trade):
 
     def pay_wage(self):
         for offer in self.labor_offers:
-            self.sell('household', offer.sender_id, good='mana', quantity=offer.quantity * self.mpl, price=0)
+            self.sell(offer.sender, good='mana', quantity=offer.quantity * self.mpl, price=0)
 
     def pay_profit(self):
-        profits = self.possession('mana')
         for offer in self.capital_offers:
-            self.sell('household', offer.sender_id, good='mana', quantity=offer.quantity * self.mpc, price=0)
-            self.give('household', offer.sender_id, good='capital', quantity=offer.quantity)
+            self.sell(offer.sender, good='mana', quantity=offer.quantity * self.mpc, price=0)
+            self.give(offer.sender, good='capital', quantity=offer.quantity)
 
-        assert self.possession('mana') < 0.0001
+        assert self.not_reserved('mana') < 0.0001
 
 

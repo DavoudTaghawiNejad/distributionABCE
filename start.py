@@ -1,4 +1,13 @@
-from __future__ import division
+""" This simulation simulates the distributional evolution of a society. In this simulation
+a population of individuals endowed with human and capital endowment, sells their endowments
+for a wage and profits to a representative firm. Wage is the marginal
+productivity of labor and profit is the marginal productivity of capital.
+
+The remuneration is in terms of a representative good, which can be either consumed or
+cost free transformed into capital.
+
+
+"""
 from firm import Firm
 from household import Household
 from abce import Simulation, gui
@@ -12,13 +21,12 @@ simulation_parameters = {'name': 'name',
                          'cd_labor': 0.7}
 
 def main(simulation_parameters):
-        simulation = Simulation(rounds=simulation_parameters['rounds'])
+        simulation = Simulation()
 
 
         simulation.declare_round_endowment(resource='labor_endowment',
                                            units=1,
-                                           product='labor'
-        )
+                                           product='labor')
         simulation.declare_perishable(good='labor')
 
 
@@ -37,19 +45,20 @@ def main(simulation_parameters):
 
 
         try:  # makes sure that graphs are displayed even when the simulation fails
-            for round in simulation.next_round():
-                households.do('send_labor_and_captial')
-                firms.do('production')
-                firms.do('pay_wage')
-                households.do('receive_wage')
-                firms.do('pay_profit')
-                households.do('receive_profit')
-                households.do('consume_and_save')
+            for r in range(simulation_parameters['rounds']):
+                simulation.advance_round(r)
+                households.send_labor_and_captial()
+                firms.production()
+                firms.pay_wage()
+                households.receive_wage()
+                firms.pay_profit()
+                households.receive_profit()
+                households.consume_and_save()
         except:
             pass
         finally:
-            gini_coef.transform_data_frame(simulation.path)
             simulation.graphs()
+            gini_coef.transform_data_frame(simulation.path)
 
 if __name__ == '__main__':
     main(simulation_parameters)
