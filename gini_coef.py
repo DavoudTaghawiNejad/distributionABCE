@@ -58,7 +58,7 @@ def GRLC(values):
 
 
 def transform_data_frame(path):
-    df = pd.read_csv(path + '/household.csv')
+    df = pd.read_csv(path + '/panel_household.csv')
     wage = df.pivot(index='round', columns='id', values='wage')
     profit = df.pivot(index='round', columns='id', values='profit')
     total_income = df.pivot(index='round', columns='id', values='total_income')
