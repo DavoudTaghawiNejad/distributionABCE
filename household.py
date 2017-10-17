@@ -3,7 +3,7 @@ import abce
 
 class Household(abce.Agent, abce.Household, abce.Trade):
     def init(self, simulation_parameters, agent_parameters):
-        self.create('capital', agent_parameters['capital'])
+        self.create('capital', max(0, agent_parameters['capital']))
         self.create('labor_endowment', agent_parameters['labor'])
 
     def send_labor_and_captial(self):
