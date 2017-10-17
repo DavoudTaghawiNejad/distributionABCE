@@ -45,7 +45,7 @@ class Firm(abce.Agent, abce.Firm, abce.Trade):
     def pay_profit(self):
         for offer in self.capital_offers:
             self.sell(offer.sender, good='mana', quantity=offer.quantity * self.mpc, price=0)
-            self.give(offer.sender, good='capital', quantity=offer.quantity)
+            self.give(offer.sender, good='capital', quantity=offer.quantity, epsilon=0.00001)
 
         assert self.not_reserved('mana') < 0.0001
 
