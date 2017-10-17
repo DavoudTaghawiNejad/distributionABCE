@@ -13,6 +13,10 @@ from household import Household
 from abce import Simulation, gui
 import csv
 import gini_coef
+import pandas as pd
+import holoviews as hv
+renderer = hv.renderer('matplotlib').instance(fig='pdf', holomap='gif')
+
 
 simulation_parameters = {'name': 'name',
                          'rounds': 50,
@@ -58,7 +62,62 @@ def main(simulation_parameters):
             pass
         finally:
             simulation.graphs()
-            gini_coef.transform_data_frame(simulation.path)
+
+
+def plot_distributions(distributions, r):
+    distributions = pd.DataFrame(distributions)
+    distributions.sort_values(by='income', ascending=True, inplace=True)
+    distributions.reset_index(drop=True, inplace=True)
+
+
+    Y = sum(distributions['income'])
+    ttl_profit = sum(distributions['profit'])
+    ttl_wage = sum(distributions['wage'])
+    ttl_consumption = sum(distributions['consumption'])
+    ttl_saving = sum(distributions['saving'])
+
+    income_dist = pd.DataFrame()
+    income_dist['income'] = distributions['income'].cumsum() / Y
+    income_dist['wage'] = distributions['wage'].cumsum() / Y
+    income_dist['profit'] = distributions['profit'].cumsum() / Y
+    income_dist['index'] = distributions.index
+    income_dist['profit0polarization'] = ttl_profit / Y * income_dist['income']
+    income_dist['wage0polarization'] = ttl_wage / Y * income_dist['income']
+    income_dist = hv.Dataset(income_dist)
+
+    spending_dist = pd.DataFrame()
+    spending_dist['income'] = distributions['income'].cumsum() / Y
+    spending_dist['consumption'] = distributions['consumption'].cumsum() / Y
+    spending_dist['saving'] = distributions['saving'].cumsum() / Y
+    spending_dist['index'] = distributions.index
+    spending_dist['consumption0polarization'] = ttl_consumption / Y * income_dist['income']
+    spending_dist['saving0polarization'] = ttl_saving / Y * income_dist['income']
+    spending_dist = hv.Dataset(spending_dist)
+
+    graph = ((hv.Curve(income_dist, kdims=['index'], vdims=['income'], label='Income') *
+              hv.Curve(income_dist, kdims=['index'], vdims=['profit'], label='Profit') *
+              hv.Curve(income_dist, kdims=['index'], vdims=['wage'], label='Wage') *
+              hv.Curve(income_dist, kdims=['index'], vdims=['profit0polarization'], label='profit0polarization') *
+              hv.Curve(income_dist, kdims=['index'], vdims=['wage0polarization'], label='wage0polarization')) +
+
+             (hv.Curve(spending_dist, kdims=['index'], vdims=['income'], label='Income') *
+              hv.Curve(spending_dist, kdims=['index'], vdims=['consumption'], label='Consumption') *
+              hv.Curve(spending_dist, kdims=['index'], vdims=['saving'], label='Saving') *
+              hv.Curve(spending_dist, kdims=['index'], vdims=['consumption0polarization'], label='consumption0polarization') *
+              hv.Curve(spending_dist, kdims=['index'], vdims=['saving0polarization'], label='saving0polarization')))
+
+
+
+
+    renderer.save(graph, '%05i' % r, style=dict(Image={'cmap':'jet'}))
+
+
+    # raise SystemExit()
+
+
+
+
+
 
 if __name__ == '__main__':
     main(simulation_parameters)
