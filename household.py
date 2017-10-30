@@ -1,5 +1,5 @@
 import abce
-
+from math import exp
 
 class Household(abce.Agent, abce.Household, abce.Trade):
     def init(self, simulation_parameters, agent_parameters):
@@ -25,10 +25,13 @@ class Household(abce.Agent, abce.Household, abce.Trade):
         self.profit = profit.quantity
 
     def consume_and_save(self):
-        self.log('total_income', self['mana'])
-        self.destroy('mana', 0.5 * self['mana'])
-        self.create('capital', self['mana'])
-        self.destroy('mana', self['mana'])  # use proper transformation not create / destroy !
+        self.total_income = self['mana']
+        self.saving = 0.5 * self['mana']
+        self.consumption = self['mana'] - self.saving
+        self.destroy('mana', self.consumption)
+        self.create('capital', self.saving)
+        self.destroy('mana', self.saving)  # use proper transformation not create / destroy !
+
     def return_income(self):
         return {'income': self.total_income, 'wage': self.wage, 'profit': self.profit, 'consumption': self.consumption, 'saving': self.saving}
 
