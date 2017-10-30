@@ -10,7 +10,7 @@ class Firm(abce.Agent, abce.Firm, abce.Trade):
         def production_function(goods):
             return goods['labor'] ** self.cd_labor * goods['capital'] ** self.cd_capital
 
-        use = {'labor': 1, 'capital': 0}
+        use = {'labor': 1, 'capital': 0.05}
 
         self.set_production_function(production_function, output='mana', use=use)
 
@@ -43,9 +43,11 @@ class Firm(abce.Agent, abce.Firm, abce.Trade):
             self.sell(offer.sender, good='mana', quantity=offer.quantity * self.mpl, price=0)
 
     def pay_profit(self):
+        remaining_cap =  self['capital'] / sum([o.quantity for o in self.capital_offers])
+        print(remaining_cap)
         for offer in self.capital_offers:
             self.sell(offer.sender, good='mana', quantity=offer.quantity * self.mpc, price=0)
-            self.give(offer.sender, good='capital', quantity=offer.quantity, epsilon=0.00001)
+            self.give(offer.sender, good='capital', quantity=offer.quantity * remaining_cap, epsilon=0.0001)
 
         assert self.not_reserved('mana') < 0.0001
 
