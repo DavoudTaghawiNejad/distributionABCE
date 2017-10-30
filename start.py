@@ -22,7 +22,8 @@ simulation_parameters = {'name': 'name',
                          'rounds': 50,
                          'population_file': 'population.csv',
                          'cd_capital': 0.3,
-                         'cd_labor': 0.7}
+                         'cd_labor': 0.7,
+                         'depreciation': 0.05}
 
 def main(simulation_parameters):
         simulation = Simulation()
